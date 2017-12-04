@@ -1,0 +1,23 @@
+language: python
+python:
+  - 3.6
+
+env:
+  - VOTE_IMAGE="$DOCKER_USERNAME/voting-vote:$TRAVIS_COMMIT" WORKER_IMAGE="$DOCKER_USERNAME/voting-worker:$TRAVIS_COMMIT" RESULT_IMAGE="$DOCKER_USERNAME/voting-result:$TRAVIS_COMMIT"
+
+services:
+  - docker
+
+install:
+  - pip3 install -r vote/requirements.txt
+
+script:
+  - docker build -t $VOTE_IMAGE vote
+  - docker build -t $WORKER_IMAGE worker
+  - docker build -t $RESULT_IMAGE result
+
+after_success:
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  - docker push $VOTE_IMAGE
+  - docker push $WORKER_IMAGE
+  - docker push $RESULT_IMAGE
